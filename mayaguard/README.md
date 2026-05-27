@@ -14,30 +14,46 @@
 
 MayaGuard runs an adapter-aware, domain-agnostic pipeline that ensures LLM responses remain strictly grounded in verified facts before reaching the client:
 
-```text
-  [ User Query ]
-        │
-        ▼
- 1. [ PREPROCESS ] ──► (Transfrom/Sanitise Query)
-        │
-        ▼
- 2. [ RETRIEVE ]   ──► (Query Embeddings via MiniLM ──► Qdrant Semantic Search)
-        │
-        ▼
- 3. [ GENERATE ]   ──► (Instruct LLM using Domain-Specific System Prompts)
-        │
-        ▼
- 4. [ VERIFY ]     ──► ┌── (Claim Extraction: break answer into atomic assertions)
-        │              ├── (Grounding Checker: verify each claim against Qdrant)
-        │              └── (Self-Reflection: LLM self-critique pass & confidence rating)
-        ▼
- 5. [ SCORE ]      ──► (Aggregate Faithfulness, Reflection, and Entropy + Floor Penalty)
-        │
-        ▼
- 6. [ CONTROL ]    ──► (Enforce Safety Thresholds: Pass / Disclaimer / Rewrite / Refuse)
-        │
-        ▼
-  [ Safe Answer ]
+```mermaid
+graph LR
+    subgraph "Domain Adapters"
+        direction TB
+        Medical[🏥 Medical Adapter]
+        Legal[⚖️ Legal Adapter]
+        DevOps[⚙️ DevOps Adapter]
+    end
+
+    subgraph "Core MayaGuard Pipeline"
+        direction TB
+        Query[🔍 User Query] --> Pre[1. Preprocess Query]
+        Pre --> Ret[2. Semantic Retrieval<br/>Qdrant Vector Search]
+        Ret --> Gen[3. LLM Generation<br/>Ollama / vLLM Inference]
+        
+        Gen --> Ext[4a. Claim Extractor<br/>Atomic Factual Splits]
+        Ext --> Grn[4b. Grounding Checker<br/>Semantic Fact-Checking]
+        
+        Gen --> Ref[4c. Self-Reflection Agent<br/>Dual-Pass Self-Critique]
+        
+        Grn --> Det[5. Hallucination Detector<br/>Multi-Weighted Risk Scoring]
+        Ref --> Det
+        
+        Det --> Ctrl[6. Response Controller<br/>Safety Actions: Pass/Disclaimer/Rewrite/Refuse]
+        Ctrl --> Safe[🛡️ Client Safe Answer]
+    end
+
+    Medical -.->|injects prompts & policies| Pre
+    Legal -.->|injects prompts & policies| Pre
+    DevOps -.->|injects prompts & policies| Pre
+
+    classDef adapter fill:#1e272e,stroke:#3d3d3d,stroke-width:2px,color:#fff;
+    classDef pipeline fill:#2f3542,stroke:#57606f,stroke-width:2px,color:#fff;
+    classDef query fill:#1abc9c,stroke:#16a085,stroke-width:2px,color:#fff;
+    classDef safe fill:#2ecc71,stroke:#27ae60,stroke-width:2px,color:#fff;
+    
+    class Medical,Legal,DevOps adapter;
+    class Pre,Ret,Gen,Ext,Grn,Ref,Det,Ctrl pipeline;
+    class Query query;
+    class Safe safe;
 ```
 
 ---
