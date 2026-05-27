@@ -1,5 +1,5 @@
 """
-frontend/dashboard.py — MayaGuard Streamlit monitoring dashboard.
+Streamlit interactive monitoring dashboard for MayaGuard.
 
 Run with:
     streamlit run frontend/dashboard.py
@@ -75,8 +75,8 @@ if "history" not in st.session_state:
 
 # ── Header ─────────────────────────────────────────────────────────────────────
 
-st.title("🛡️ MayaGuard — Hallucination-Aware AI Monitor")
-st.caption("Phase 1 Core Platform — domain-agnostic hallucination detection")
+st.title("🛡️ MayaGuard - Hallucination-Aware AI Monitor")
+st.caption("Phase 1 Core Platform - domain-agnostic hallucination detection")
 
 st.divider()
 
@@ -84,7 +84,7 @@ st.divider()
 
 with st.sidebar:
     st.header("Settings")
-    adapter = st.selectbox("Adapter", ["default"], index=0)
+    adapter = st.selectbox("Adapter", ["default", "medical", "legal", "devops"], index=0)
     top_k = st.slider("Retrieval top-k", 1, 10, 5)
     st.divider()
     st.subheader("Stats (this session)")
@@ -171,7 +171,7 @@ if submitted and query.strip():
                     icon = "✅" if v["supported"] else "❌"
                     st.markdown(
                         f"{icon} **{v['claim']['text']}**  \n"
-                        f"&nbsp;&nbsp;Confidence: `{v['confidence']:.2f}` — {v['explanation']}"
+                        f"&nbsp;&nbsp;Confidence: `{v['confidence']:.2f}` - {v['explanation']}"
                     )
             else:
                 st.info("No individual claim data.")

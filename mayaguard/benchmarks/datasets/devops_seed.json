@@ -1,0 +1,82 @@
+[
+  {
+    "content": "To configure TLS termination on a Kubernetes Ingress resource, define the `spec.tls` array referencing the specific hosts and the `secretName` which houses the TLS private key and certificate. The secret must be created in the same namespace as the Ingress resource.",
+    "source": "Kubernetes Ingress API Reference v1",
+    "metadata": {
+      "topic": "Kubernetes",
+      "component": "Ingress TLS"
+    }
+  },
+  {
+    "content": "To force SSL redirection in NGINX Ingress controller, add the annotation `nginx.ingress.kubernetes.io/ssl-redirect: \"true\"` to the Ingress metadata block. If cert-manager is used for automatic certificate provisioning, include the annotation `cert-manager.io/cluster-issuer: \"letsencrypt-prod\"`.",
+    "source": "NGINX Ingress Controller Guide",
+    "metadata": {
+      "topic": "Kubernetes",
+      "component": "Ingress Annotations"
+    }
+  },
+  {
+    "content": "In Prometheus, the scrape interval dictates how frequently the server fetches metrics from configured endpoints. It is defined in the `global` configuration block using the `scrape_interval` field (defaulting to 15s). Individual scrape jobs can override this value via their specific job configuration.",
+    "source": "Prometheus Configuration Spec",
+    "metadata": {
+      "topic": "Prometheus",
+      "component": "Scrape Global Settings"
+    }
+  },
+  {
+    "content": "Prometheus metric relabeling allows renaming or dropping metrics before they are stored in the time-series database. Define `metric_relabel_configs` with `source_labels` (e.g. `__name__`), `regex` to match, and `action: keep` or `action: drop` to selectively filter ingested metrics.",
+    "source": "Prometheus Relabeling Guide",
+    "metadata": {
+      "topic": "Prometheus",
+      "component": "Metric Relabeling"
+    }
+  },
+  {
+    "content": "By default, Docker containers on the default bridge network can communicate with each other. To enforce strict container isolation and comply with security best practices, launch the Docker daemon with the parameter `--icc=false` (Inter-Container Communication set to false), forcing containers to communicate only via explicit user-defined bridge networks.",
+    "source": "Docker Daemon Security Guide",
+    "metadata": {
+      "topic": "Docker",
+      "component": "Network Isolation"
+    }
+  },
+  {
+    "content": "Docker overlay networks enable multi-host communication in Docker Swarm or Kubernetes clusters. To secure container-to-container communication, overlay networks can be encrypted at the IPsec level by defining the `--opt encrypted` flag during network creation, encrypting all data traffic passing between daemon nodes.",
+    "source": "Docker Swarm Networking Engine",
+    "metadata": {
+      "topic": "Docker",
+      "component": "Overlay Network Encryption"
+    }
+  },
+  {
+    "content": "In NGINX, proxy buffering stores responses from the upstream server in temporary buffers, reducing overhead on high-latency client connections. Optimize this behavior by configuring `proxy_buffers 8 16k;` and `proxy_buffer_size 16k;` within the server or location blocks, adjusting buffers to accommodate average response header sizes.",
+    "source": "NGINX Tuning Manual",
+    "metadata": {
+      "topic": "NGINX",
+      "component": "Proxy Buffer Optimization"
+    }
+  },
+  {
+    "content": "To secure NGINX web servers against common vulnerabilities, configure security headers in the HTTP block. Always add `add_header Strict-Transport-Security \"max-age=63072000; includeSubDomains; preload\" always;` for HSTS, and `add_header X-Frame-Options \"DENY\" always;` to prevent clickjacking attacks.",
+    "source": "OWASP Secure Headers Guide",
+    "metadata": {
+      "topic": "NGINX",
+      "component": "Security Headers"
+    }
+  },
+  {
+    "content": "To minimize Docker image sizes, always implement multi-stage builds in your Dockerfiles. Use a heavy build stage containing all build tools, compilers, and dependencies (e.g. `golang:1.22-alpine`), and then copy only the compiled binaries into a minimal runtime stage (e.g. `scratch` or `alpine:3.19`), reducing attack surface area.",
+    "source": "Docker Best Practices Manual",
+    "metadata": {
+      "topic": "Docker",
+      "component": "Dockerfile Optimization"
+    }
+  },
+  {
+    "content": "Kubernetes Pod lifecycles are monitored via Liveness and Readiness probes. A `livenessProbe` determines if the container needs to be restarted due to deadlock, whereas a `readinessProbe` determines if the container is ready to accept service traffic. Configure `initialDelaySeconds` and `periodSeconds` to prevent premature probe failures.",
+    "source": "Kubernetes Pod Lifecycle Specs",
+    "metadata": {
+      "topic": "Kubernetes",
+      "component": "Health Probes"
+    }
+  }
+]

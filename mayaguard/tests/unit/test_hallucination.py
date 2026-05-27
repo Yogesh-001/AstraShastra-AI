@@ -1,7 +1,3 @@
-"""
-tests/unit/test_hallucination.py — Unit tests for the hallucination detector.
-"""
-
 from core.hallucination.detector import (
     HallucinationDetector,
     compute_faithfulness,

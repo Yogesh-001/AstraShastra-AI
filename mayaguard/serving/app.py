@@ -1,10 +1,10 @@
 """
-serving/app.py — FastAPI application.
+FastAPI application endpoints for the MayaGuard pipeline.
 
 Endpoints:
-  POST /api/v1/query        → run full MayaGuard pipeline
-  GET  /api/v1/health       → liveness probe
-  GET  /api/v1/metrics      → Prometheus text exposition (if enabled)
+  POST /api/v1/query        - run full MayaGuard pipeline
+  GET  /api/v1/health       - liveness probe
+  GET  /api/v1/metrics      - Prometheus text exposition (if enabled)
 """
 
 from __future__ import annotations

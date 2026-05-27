@@ -34,6 +34,7 @@ benchmarks/results/*.json
 
 # Docker
 docker/volumes/
+mayaguard_qdrant_local/
 
 # OS
 .DS_Store

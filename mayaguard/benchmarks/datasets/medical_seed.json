@@ -1,0 +1,122 @@
+[
+  {
+    "content": "Metformin is the primary pharmacotherapy for type 2 diabetes mellitus. It operates by activating adenosine monophosphate-activated protein kinase (AMPK) in hepatocytes, which subsequently downregulates the expression of key gluconeogenic enzymes.",
+    "source": "PubMed:PMC8122345",
+    "metadata": {
+      "topic": "Pharmacology",
+      "mechanism": "AMPK Activation"
+    }
+  },
+  {
+    "content": "At the cellular level, Metformin reduces hepatic glucose output by inhibiting mitochondrial respiratory chain complex I. This leads to a decrease in hepatic energy status, lowering ATP levels and actively suppressing gluconeogenesis.",
+    "source": "PubMed:PMC7112341",
+    "metadata": {
+      "topic": "Pharmacology",
+      "mechanism": "Complex I Inhibition"
+    }
+  },
+  {
+    "content": "Metformin increases peripheral insulin sensitivity and glucose uptake in skeletal muscle. This action is mediated by promoting the translocation of glucose transporter type 4 (GLUT4) vesicles to the cell membrane, facilitating insulin-mediated glucose disposal.",
+    "source": "PubMed:PMC7998124",
+    "metadata": {
+      "topic": "Pharmacology",
+      "insulin_sensitivity": "GLUT4 Translocation"
+    }
+  },
+  {
+    "content": "The landmark United Kingdom Prospective Diabetes Study (UKPDS) demonstrated that intensive blood-glucose control with Metformin was associated with a 32% reduction in any diabetes-related endpoint, a 39% reduction in myocardial infarction, and a 36% reduction in all-cause mortality compared to conventional therapy.",
+    "source": "Lancet:UKPDS1998",
+    "metadata": {
+      "topic": "Clinical Trials",
+      "study": "UKPDS"
+    }
+  },
+  {
+    "content": "Lactic acidosis is a rare but life-threatening adverse drug reaction associated with Metformin accumulation, typically occurring in patients with severe pre-existing renal impairment. Metformin inhibits pyruvate carboxylase, shifting lactate metabolism toward anaerobic pathways and resulting in elevated lactate concentrations.",
+    "source": "FDA Warning:Metformin",
+    "metadata": {
+      "topic": "Safety",
+      "adverse_effect": "Lactic Acidosis"
+    }
+  },
+  {
+    "content": "Metformin is strictly contraindicated in patients with severe renal impairment, defined as an estimated glomerular filtration rate (eGFR) below 30 mL/min/1.73m2. For patients with an eGFR between 30 and 45 mL/min/1.73m2, initiation is not recommended, and existing therapy should be halved or monitored closely.",
+    "source": "ADA Standards of Care 2024",
+    "metadata": {
+      "topic": "Safety",
+      "renal_impairment": "eGFR Limits"
+    }
+  },
+  {
+    "content": "Gastrointestinal side effects, including nausea, vomiting, abdominal cramping, and osmotic diarrhea, affect up to 25% of patients initiating Metformin. To mitigate these side effects, clinician guidelines recommend slow dose titration starting at 500 mg daily and administering the drug with meals.",
+    "source": "UpToDate:Metformin",
+    "metadata": {
+      "topic": "Safety",
+      "adverse_effect": "Gastrointestinal Distress"
+    }
+  },
+  {
+    "content": "Long-term usage of Metformin is associated with a risk of Vitamin B12 deficiency due to drug-induced malabsorption of the vitamin-intrinsic factor complex in the terminal ileum. Periodic monitoring of serum B12 levels is recommended, particularly for patients presenting with peripheral neuropathy or macrocytic anemia.",
+    "source": "PubMed:PMC8243122",
+    "metadata": {
+      "topic": "Safety",
+      "adverse_effect": "Vitamin B12 Malabsorption"
+    }
+  },
+  {
+    "content": "The Metformin in Gestational Diabetes (MiG) trial established that Metformin therapy in pregnant women with gestational diabetes mellitus (GDM) was not associated with an increase in neonatal complications compared to insulin therapy, and was preferred by patients.",
+    "source": "NEJM:MiG2008",
+    "metadata": {
+      "topic": "Clinical Trials",
+      "study": "MiG Trial"
+    }
+  },
+  {
+    "content": "Contraindications for Metformin include acute or chronic metabolic acidosis (including diabetic ketoacidosis), severe hepatic dysfunction, acute heart failure, and cardiogenic or septic shock, as these conditions significantly elevate the risk of lactic acidosis.",
+    "source": "WHO Model Formulary 2024",
+    "metadata": {
+      "topic": "Safety",
+      "contraindications": "Acidosis Risk"
+    }
+  },
+  {
+    "content": "Metformin therapy must be temporarily discontinued prior to or at the time of undergoing an imaging procedure involving iodinated contrast media in patients with an eGFR between 30 and 60 mL/min/1.73m2. Therapy should remain withheld for 48 hours post-procedure and only re-initiated after confirming stable renal function.",
+    "source": "ACR Contrast Media Manual 2023",
+    "metadata": {
+      "topic": "Safety",
+      "procedure": "Iodinated Contrast"
+    }
+  },
+  {
+    "content": "Metformin is frequently used off-label in the management of Polycystic Ovary Syndrome (PCOS). By reducing hyperinsulinemia, Metformin subsequently reduces androgen production in the ovaries, which can restore normal ovulatory menstrual cycles and improve fertility.",
+    "source": "ACOG Practice Bulletin",
+    "metadata": {
+      "topic": "Clinical Trials",
+      "off_label": "PCOS Ovulation"
+    }
+  },
+  {
+    "content": "The Diabetes Prevention Program (DPP) clinical trial demonstrated that Metformin therapy reduced the incidence of developing type 2 diabetes by 31% over a 2.8-year follow-up period in high-risk individuals with prediabetes, showing particular efficacy in younger, more obese patients.",
+    "source": "NEJM:DPP2002",
+    "metadata": {
+      "topic": "Clinical Trials",
+      "study": "Diabetes Prevention Program"
+    }
+  },
+  {
+    "content": "Concomitant administration of organic cation transporter 2 (OCT2) inhibitors, such as cimetidine or dolutegravir, may increase systemic exposure of Metformin by reducing its renal clearance. Dose adjustments should be considered if renal function is impaired.",
+    "source": "DrugBank:Metformin",
+    "metadata": {
+      "topic": "Pharmacology",
+      "drug_interaction": "OCT2 Inhibitors"
+    }
+  },
+  {
+    "content": "Metformin exhibits a bioavailability of approximately 50-60% and is primarily absorbed in the small intestine. It is not metabolized by the liver, possesses negligible plasma protein binding, and is excreted unchanged in the urine via active tubular secretion.",
+    "source": "Clinical Pharmacokinetics Journal",
+    "metadata": {
+      "topic": "Pharmacology",
+      "pharmacokinetics": "Absorption and Excretion"
+    }
+  }
+]

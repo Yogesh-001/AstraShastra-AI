@@ -1,9 +1,6 @@
 """
-adapters/base.py — Abstract domain adapter interface.
-
-Every domain adapter (medical, legal, devops …) must subclass
-DomainAdapter and implement all abstract methods.  The core pipeline
-never imports domain-specific code; it only calls this interface.
+Abstract domain adapter interface.
+Defines the contract that every domain adapter must implement to interact with the core pipeline.
 """
 
 from __future__ import annotations
@@ -14,7 +11,7 @@ from dataclasses import dataclass, field
 from core.models import Document
 
 
-# ── Prompt template ────────────────────────────────────────────────────────────
+# Prompt template definition
 
 @dataclass
 class PromptTemplate:
@@ -27,7 +24,7 @@ class PromptTemplate:
         return self.user_template.format(query=query, context=context)
 
 
-# ── Safety policy ──────────────────────────────────────────────────────────────
+# Safety policy overrides
 
 @dataclass
 class SafetyPolicy:
@@ -41,7 +38,7 @@ class SafetyPolicy:
     forbidden_topics: list[str] = field(default_factory=list)
 
 
-# ── Evaluation suite ───────────────────────────────────────────────────────────
+# Evaluation suite properties
 
 @dataclass
 class EvaluationSuite:
@@ -52,14 +49,14 @@ class EvaluationSuite:
     metric_names: list[str]    # e.g. ["hallucination_rate", "faithfulness_mean"]
 
 
-# ── Abstract base ──────────────────────────────────────────────────────────────
+# Abstract base class
 
 class DomainAdapter(ABC):
     """
     Contract that every domain adapter must fulfil.
 
     The core pipeline calls these methods without knowing which adapter
-    is active — dependency inversion at the architecture level.
+    is active - dependency inversion at the architecture level.
     """
 
     @property
@@ -73,8 +70,8 @@ class DomainAdapter(ABC):
         Return kwargs passed to Retriever.create().
 
         Minimum required keys:
-          collection (str)       — Qdrant collection name
-          embed_model_name (str) — HuggingFace embedding model
+          collection (str)       - Qdrant collection name
+          embed_model_name (str) - HuggingFace embedding model
         """
 
     @abstractmethod
@@ -89,7 +86,7 @@ class DomainAdapter(ABC):
     def get_evaluation_suite(self) -> EvaluationSuite:
         """Return dataset path and metric names for evaluation."""
 
-    # ── Optional hooks ────────────────────────────────────────────
+    # Optional lifecycle hooks
 
     def preprocess_query(self, query: str) -> str:
         """Hook: transform or sanitise the query before retrieval."""

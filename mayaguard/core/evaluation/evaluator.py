@@ -1,5 +1,5 @@
 """
-core/evaluation — Evaluation framework.
+core/evaluation - Evaluation framework.
 
 Runs a labelled dataset through the full MayaGuard pipeline and
 computes aggregate metrics: hallucination rate, faithfulness, precision,

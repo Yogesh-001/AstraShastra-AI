@@ -1,13 +1,6 @@
 """
-core/retrieval — Qdrant-backed vector retrieval.
-
-Responsibilities:
-  - Embed queries using a configurable embedding model
-  - Store and search document chunks in Qdrant
-  - Return ranked Document objects
-
-Domain adapters supply their own collection name and corpus;
-this module stays completely domain-agnostic.
+Qdrant-backed vector retrieval service.
+Handles document indexing, query embedding, and semantic similarity search.
 """
 
 from __future__ import annotations
@@ -46,7 +39,7 @@ class Retriever:
         self._embed = embed_model
         self._collection = collection
 
-    # ── Factory ───────────────────────────────────────────────────
+    # Factory methods
 
     @classmethod
     async def create(
@@ -62,7 +55,16 @@ class Retriever:
             embed_model_name: HuggingFace model name for embeddings.
         """
         col = collection or _settings.qdrant_collection
-        client = AsyncQdrantClient(url=_settings.qdrant_url)
+        try:
+            client = AsyncQdrantClient(url=_settings.qdrant_url)
+            # Verify connection works by trying to get collections
+            await client.get_collections()
+            logger.info("retriever.connected_server", url=_settings.qdrant_url)
+        except Exception as exc:
+            local_path = "mayaguard_qdrant_local"
+            logger.warning("retriever.fallback_local_storage", path=local_path, reason=str(exc))
+            client = AsyncQdrantClient(path=local_path)
+
         embed = SentenceTransformer(embed_model_name)
 
         dim = embed.get_sentence_embedding_dimension()
@@ -84,17 +86,23 @@ class Retriever:
             )
             logger.info("retriever.collection_created", name=name)
 
-    # ── Public API ────────────────────────────────────────────────
+    # Public retrieval and indexing API
 
     async def retrieve(self, query: str, top_k: int = 5) -> RetrievalResult:
         """Return the top-k most relevant documents for *query*."""
         vector = self._embed.encode(query).tolist()
-        hits = await self._client.search(
+        client = self._client
+        search_fn = client._client.search if hasattr(client, "_client") and hasattr(client._client, "search") else client.search
+        res = search_fn(
             collection_name=self._collection,
             query_vector=vector,
             limit=top_k,
             with_payload=True,
         )
+        if hasattr(res, "__await__"):
+            hits = await res
+        else:
+            hits = res
 
         docs = [
             Document(
@@ -135,3 +143,7 @@ class Retriever:
     def _stable_id(raw: str) -> int:
         """Convert an arbitrary string ID to a stable uint64."""
         return int(hashlib.sha256(raw.encode()).hexdigest()[:16], 16)
+
+    async def close(self) -> None:
+        """Close the underlying Qdrant client connection."""
+        await self._client.close()

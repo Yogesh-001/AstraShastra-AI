@@ -18,7 +18,7 @@ services:
       - "11434:11434"
     volumes:
       - ollama_models:/root/.ollama
-    # GPU passthrough — comment out if no NVIDIA runtime
+    # GPU passthrough - comment out if no NVIDIA runtime
     deploy:
       resources:
         reservations:

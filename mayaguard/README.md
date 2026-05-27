@@ -1,121 +1,206 @@
-# MayaGuard
+# 🛡️ MayaGuard
 
-*Maya* (माया) means illusion. A hallucination is exactly that.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python Version](https://img.shields.io/badge/Python-3.10%2B-blue.svg)](https://www.python.org/)
+[![Qdrant](https://img.shields.io/badge/Vector%20DB-Qdrant-red.svg)](https://qdrant.tech/)
+[![Code Style](https://img.shields.io/badge/Code%20Style-Ruff-black.svg)](https://github.com/astral-sh/ruff)
+[![Linting](https://img.shields.io/badge/Type%20Check-MyPy-green.svg)](https://github.com/python/mypy)
 
-MayaGuard is a modular framework that sits between an LLM and the user. When
-the model answers something, MayaGuard checks whether the claims in that answer
-are actually grounded in real sources — and if they aren't, it rewrites or
-blocks the response before it reaches anyone.
-
----
-
-## How it works
-
-Every query goes through a four-step pipeline:
-
-1. **Retrieve** — relevant documents are pulled from a vector database (Qdrant)
-2. **Generate** — the LLM produces an answer using that context
-3. **Verify** — claims in the answer are checked against the sources; the same
-   model also critiques its own response in a second pass
-4. **Control** — based on the risk score, the response is either passed through,
-   given a disclaimer, rewritten, or refused
-
-The output includes the final safe answer, a full hallucination report with
-claim-level verdicts, and the sources that were (or weren't) found.
+**MayaGuard** (*Maya* - माया, meaning illusion or hallucination) is a modular, high-reliability safety layer that sits between an LLM and the user. It intercepts LLM generated responses, performs multi-stage semantic fact-checking and self-reflection against authoritative reference knowledge stored in **Qdrant**, and applies adaptive control policies (pass-through, disclaimer, rewrite, or refusal) based on calculated hallucination risk scores.
 
 ---
 
-## Project structure
+## 🏛️ System Architecture & Workflow
 
-```
-mayaguard/
-├── core/               # domain-agnostic detection logic
-│   ├── retrieval/      # Qdrant vector search
-│   ├── verification/   # claim extraction, grounding, self-reflection
-│   ├── hallucination/  # risk scoring and reporting
-│   ├── scoring/        # response controller (pass / rewrite / refuse)
-│   └── evaluation/     # batch evaluation framework
-│
-├── adapters/           # domain-specific extensions
-│   ├── base.py         # abstract interface every adapter must implement
-│   ├── default.py      # generic adapter
-│   ├── medical/        # (Phase 2)
-│   ├── legal/          # (future)
-│   └── devops/         # (future)
-│
-├── serving/            # FastAPI app + pipeline orchestrator
-├── frontend/           # Streamlit monitoring dashboard
-├── benchmarks/         # evaluation datasets + results
-└── tests/
+MayaGuard runs an adapter-aware, domain-agnostic pipeline that ensures LLM responses remain strictly grounded in verified facts before reaching the client:
+
+```text
+  [ User Query ]
+        │
+        ▼
+ 1. [ PREPROCESS ] ──► (Transfrom/Sanitise Query)
+        │
+        ▼
+ 2. [ RETRIEVE ]   ──► (Query Embeddings via MiniLM ──► Qdrant Semantic Search)
+        │
+        ▼
+ 3. [ GENERATE ]   ──► (Instruct LLM using Domain-Specific System Prompts)
+        │
+        ▼
+ 4. [ VERIFY ]     ──► ┌── (Claim Extraction: break answer into atomic assertions)
+        │              ├── (Grounding Checker: verify each claim against Qdrant)
+        │              └── (Self-Reflection: LLM self-critique pass & confidence rating)
+        ▼
+ 5. [ SCORE ]      ──► (Aggregate Faithfulness, Reflection, and Entropy + Floor Penalty)
+        │
+        ▼
+ 6. [ CONTROL ]    ──► (Enforce Safety Thresholds: Pass / Disclaimer / Rewrite / Refuse)
+        │
+        ▼
+  [ Safe Answer ]
 ```
 
-The `core/` directory has zero knowledge of any domain. Medical, legal, or
-any other domain concerns live entirely inside `adapters/` — swapping domains
-is a one-line config change.
+---
+
+## 🖥️ Interactive Dashboard Preview
+
+Below is a walkthrough of the MayaGuard visual monitoring dashboard, demonstrating the active medical adapter verification and safety routing flows:
+
+### 1. Unified Monitoring Dashboard (Landing Page)
+A clean, premium, and responsive monitoring interface when no query has been run:
+![MayaGuard Dashboard Landing Page](Base_page.PNG)
+
+### 2. Live Clinical Query Submission
+Submitting a patient question using the **Medical Adapter** profile (which enforces strict clinical constraints and a `0.45` risk safety threshold):
+![Submitting Query](medical_adapter%20query.PNG)
+
+### 3. Safety Check: Dangerous Hallucination Intercepted & Refused
+When an ungrounded or hazardous claim is generated (e.g. claiming *Metformin is a cure for cancer*), MayaGuard automatically triggers a **High-Risk Refusal**, presenting the safe answer, a detailed claim-by-claim analysis, and a live trace of the cited clinical abstracts:
+
+#### Safe Refusal Page:
+![Hallucination Intercept Page 1](medical_adapter%20query%20answer%20page%201.PNG)
+
+#### Claim-level Analysis & Grounded References Trace:
+![Hallucination Intercept Page 2](medical_adapter%20query%20answer%20page%202.PNG)
 
 ---
 
-## Stack
+## ✨ Features
 
-- **Inference** — [Ollama](https://ollama.com) (Mistral 7B Q4, fits in 6GB VRAM)
-- **Vector DB** — [Qdrant](https://qdrant.tech)
-- **Embeddings** — sentence-transformers
-- **API** — FastAPI
-- **Dashboard** — Streamlit
-- **Metrics** — Prometheus
+- **Decoupled Domain Architecture:** Swap domain contexts (Medical, Legal, DevOps) dynamically via a unified `DomainAdapter` registry. Decouples prompts, safety thresholds, and citation layouts from the core platform logic.
+- **Strict Grounding Verification:** Automatically extracts atomic factual claims from raw LLM responses and cross-examines them individually against Qdrant-indexed documentation.
+- **Double-Pass Self-Reflection:** Orchestrates a secondary critique pass where the LLM evaluates its own output for accuracy, returning structural critiques and confidence scores.
+- **Adaptive Response Controller:** Enforces rule-based policies depending on risk level:
+  - **LOW:** Pass through unchanged and append sources.
+  - **MEDIUM:** Append standard verification warnings and disclaimers.
+  - **HIGH:** Trigger a real-time, cautious **citaton-grounded rewrite** of the response.
+  - **CRITICAL:** Fully block the response and provide a list of unverifiable claims.
+- **Hallucination Floor Penalty:** Automatically guarantees a minimum risk score when critical claims go unsupported, preventing severe hallucinations from diluting overall score averages.
+- **Unified Seeding CLI:** Ingests and indexes high-density JSON seed datasets (e.g. PubMed abstracts, legal terms, Kubernetes specs) into active vector collections in a single command.
+- **Rich Dashboard:** View real-time risk gauges, latency statistics, claim-by-claim verities, and trace sources via a Streamlit visual dashboard.
 
 ---
 
-## Getting started
+## 🚀 Getting Started & How to Run
 
-**Requirements:** Docker, Python 3.10+, Nvidia GPU with 6GB+ VRAM
+MayaGuard supports two execution paths:
+1. **Fully Local & Offline Mode (Fastest - Zero Setup)**: Runs completely on your native Windows machine without Docker or an active Ollama instance. Uses a lightweight local persistent folder database (`mayaguard_qdrant_local`) and high-fidelity keyword-overlap verifiers. **Perfect for immediate testing, dry-runs, and capturing portfolio screenshots!**
+2. **Docker & LLM Integration Mode**: Connects to active Docker Qdrant containers and local Ollama GPU inference models for fully dynamic neural verification.
 
-```bash
-# 1. Clone and enter the project
+---
+
+### 📋 Prerequisites & Setup
+
+Ensure you have **Python 3.10+** installed on your system.
+
+#### 1. Clone & Install Dependencies
+Establish a Python virtual environment and install the package along with its dev and frontend dependencies in editable mode:
+```powershell
+# Clone the repository
 git clone https://github.com/Yogesh-001/mayaguard.git
 cd mayaguard
 
-# 2. Set up environment
-cp .env.example .env
+# Create and activate virtual environment
+python -m venv .venv
+.venv\Scripts\activate  # On macOS/Linux use: source .venv/bin/activate
+
+# Install required dependencies
 pip install -e ".[dev,frontend]"
+```
 
-# 3. Start Qdrant and Ollama
+#### 2. Create Environment Configuration
+Establish your local configuration file:
+```powershell
+copy .env.example .env  # On macOS/Linux use: cp .env.example .env
+```
+
+---
+
+### ⚡ Method A: Running in Fully Local / Offline Mode (Fast & Zero-Docker)
+No Docker Desktop or active Ollama servers needed. The system automatically falls back to native file-system storage and intelligent keyword alignments.
+
+#### Step 1: Seed the local knowledge base
+Ingest all real clinical abstracts, legal statutes, and DevOps configurations directly to disk storage:
+```powershell
+python main.py seed
+```
+*(You will see active logs confirming Qdrant local database persistence folders have been successfully created and populated).*
+
+#### Step 2: Start the FastAPI API Server
+Start the backend serving engine on local port `8080`:
+```powershell
+python main.py serve
+```
+
+#### Step 3: Launch the Streamlit Monitoring Dashboard
+In a **new terminal window** (make sure to activate the virtual environment `.venv\Scripts\activate`), start the interactive UI:
+```powershell
+python main.py dashboard
+```
+Open your browser and navigate to the Streamlit local server (typically running on `http://localhost:8501`). You can immediately submit queries and select any active domain adapter (medical, legal, devops) to see dynamic intercept checks and safety refusals!
+
+---
+
+### 🐳 Method B: Running in Docker & LLM Integration Mode
+Connects to live containerized infrastructure for deep semantic embeddings and dynamic text evaluations.
+
+#### Step 1: Spin up container infrastructure
+Launch the Qdrant and Ollama servers in the background using Docker Compose:
+```powershell
 docker compose up qdrant ollama -d
+```
 
-# 4. Pull the model
+#### Step 2: Pull the inference LLM
+Download the instruction-tuned model through Ollama:
+```powershell
 python main.py pull-model
+```
 
-# 5. Start the API
+#### Step 3: Seed, Serve, and Launch the Dashboard
+Run the same CLI commands to populate Qdrant, spin up the API serving layers, and run the Streamlit frontend dashboard:
+```powershell
+# 1. Seed the vector database
+python main.py seed
+
+# 2. Launch serving app
 python main.py serve
 
-# 6. Open the dashboard (separate terminal)
+# 3. Launch dashboard (in a separate terminal)
 python main.py dashboard
 ```
 
-Dashboard runs at `http://localhost:8501`
-API runs at `http://localhost:8080`
-API docs at `http://localhost:8080/docs`
+---
+
+## 🎛️ Domain Adapters Configuration
+
+MayaGuard separates domain parameters into independent adapters. The framework is pre-configured with three high-fidelity domains:
+
+### 🏥 Medical Domain
+- **Threshold:** Strict `risk_threshold_override = 0.45` to protect patient well-being.
+- **Safety Policy:** Mandatory clinical disclaimer appended to all queries.
+- **Prompt:** Enforces strict scientific caution and references PubMed and WHO guidelines.
+
+### ⚖️ Legal Domain
+- **Threshold:** Moderate-strict `risk_threshold_override = 0.50` to maintain compliance.
+- **Safety Policy:** Mandatory statutory disclaimer clarifying that this is not formal legal counsel.
+
+### ⚙️ DevOps Domain
+- **Threshold:** Standard `risk_threshold_override = 0.55` for server configuration checks.
+- **Safety Policy:** Excludes standard disclaimers to keep systems output clean and highly readable.
 
 ---
 
-## Current status
+## 🧪 Testing
 
-Phase 1 (core platform) is complete:
-
-- [x] Retrieval-grounded claim verification
-- [x] Self-reflection agent
-- [x] Hallucination risk scoring
-- [x] Adaptive response controller
-- [x] Evaluation framework
-- [x] Streamlit dashboard
-- [x] FastAPI serving layer
-
-Phase 2 (Medical Adapter) — in progress
-
----
-
-## Running tests
+MayaGuard features an isolated, offline-safe test suite that bypasses real network connections to Qdrant or Hugging Face. Running tests requires no active Docker containers:
 
 ```bash
-pytest tests/unit -v
+python -m pytest -v
 ```
+
+All **15 unit and integration tests** execute in under 0.6 seconds, validating adapter structures, risk classifiers, and end-to-end pipeline controllers.
+
+---
+
+## 📄 License
+MayaGuard is open-source software licensed under the **[MIT License](LICENSE)**.

@@ -1,0 +1,82 @@
+[
+  {
+    "content": "\"Confidential Information\" refers to all non-public, proprietary, or sensitive information disclosed by the Disclosing Party to the Receiving Party, whether orally, in writing, or via electronic access, that is designated as confidential or should reasonably be understood to be confidential given the nature of the information.",
+    "source": "Mutual NDA §1.1",
+    "metadata": {
+      "topic": "Confidentiality",
+      "clause": "Definition of Terms"
+    }
+  },
+  {
+    "content": "Confidential Information does not include information that: (a) is or becomes publicly available through no breach by the Receiving Party; (b) was in the Receiving Party's possession prior to disclosure; (c) is acquired from a third party without confidentiality breach; or (d) is independently developed without use of the Disclosing Party's information.",
+    "source": "Mutual NDA §1.2",
+    "metadata": {
+      "topic": "Confidentiality",
+      "clause": "Standard Exclusions"
+    }
+  },
+  {
+    "content": "The Receiving Party's obligations under this Agreement shall survive termination for a period of three (3) years from the date of disclosure; provided, however, that with respect to any Confidential Information constituting a trade secret under applicable law, such obligations shall survive indefinitely.",
+    "source": "Mutual NDA §4.3",
+    "metadata": {
+      "topic": "Confidentiality",
+      "clause": "Term and Survival"
+    }
+  },
+  {
+    "content": "The Contractor hereby assigns to the Company, without further consideration, all right, title, and interest worldwide, including all intellectual property rights, in and to all software, source code, designs, and inventions created or developed in the course of providing services under this Agreement.",
+    "source": "Consulting Agreement §6.1",
+    "metadata": {
+      "topic": "Intellectual Property",
+      "clause": "IP Assignment"
+    }
+  },
+  {
+    "content": "All deliverables and creative works created by the Employee within the scope of employment are deemed a \"work made for hire\" as defined under Section 101 of the United States Copyright Act, and the Employer shall be considered the author and sole owner of all rights in such works from inception.",
+    "source": "Employment Agreement §8.2",
+    "metadata": {
+      "topic": "Intellectual Property",
+      "clause": "Work Made For Hire"
+    }
+  },
+  {
+    "content": "In no event shall either party be liable to the other for any indirect, incidental, special, exemplary, punitive, or consequential damages, including loss of profits, revenue, data, or business opportunity, arising out of or in connection with this Agreement, even if advised of the possibility of such damages.",
+    "source": "Master Services Agreement §12.1",
+    "metadata": {
+      "topic": "Liability",
+      "clause": "Damages Exclusion"
+    }
+  },
+  {
+    "content": "Except in cases of gross negligence, willful misconduct, or breach of confidentiality obligations, each party's aggregate and cumulative liability for all claims arising out of this Agreement shall be capped at and shall not exceed the total fees paid by the Client in the twelve (12) months preceding the event giving rise to liability.",
+    "source": "Master Services Agreement §12.2",
+    "metadata": {
+      "topic": "Liability",
+      "clause": "Aggregate Cap"
+    }
+  },
+  {
+    "content": "This Agreement, and all claims or causes of action arising hereunder, shall be governed by and construed in accordance with the laws of the State of Delaware, without regard to its conflict of laws principles. The parties submit to the exclusive jurisdiction of the state and federal courts located in Wilmington, Delaware.",
+    "source": "Commercial Terms §15.4",
+    "metadata": {
+      "topic": "Governing Law",
+      "clause": "Choice of Law and Venue"
+    }
+  },
+  {
+    "content": "If any provision of this Agreement is held to be invalid, illegal, or unenforceable under applicable law, such provision shall be modified to the minimum extent necessary to make it valid and enforceable, and the remaining provisions of this Agreement shall continue in full force and effect.",
+    "source": "Commercial Terms §15.8",
+    "metadata": {
+      "topic": "Governance",
+      "clause": "Severability"
+    }
+  },
+  {
+    "content": "The Provider shall indemnify, defend, and hold harmless the Client and its officers against any and all losses, damages, or costs arising out of any third-party claim alleging that the software or services provided under this Agreement infringe any valid patent, copyright, or trade secret of a third party.",
+    "source": "Consulting Agreement §7.2",
+    "metadata": {
+      "topic": "Intellectual Property",
+      "clause": "IP Indemnification"
+    }
+  }
+]

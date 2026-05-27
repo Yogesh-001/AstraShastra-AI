@@ -1,12 +1,6 @@
 """
-core/hallucination — Hallucination detection engine.
-
-Aggregates signals from:
-  A. Retrieval grounding (faithfulness score)
-  B. Self-reflection     (model confidence)
-  C. Token entropy       (if vLLM logprobs available)
-
-Produces a HallucinationReport with an overall risk score.
+Hallucination detection engine.
+Aggregates signals from retrieval grounding, self-reflection, and token entropy.
 """
 
 from __future__ import annotations
@@ -28,19 +22,21 @@ logger = get_logger(__name__)
 _settings = get_settings()
 
 
-# ── Risk classifier ───────────────────────────────────────────────────────────
+# Risk classifier
 
-def score_to_risk(score: float) -> RiskLevel:
-    if score >= 0.75:
+def score_to_risk(score: float, threshold: float | None = None) -> RiskLevel:
+    """Classify a risk score into a RiskLevel using configurable thresholds."""
+    base = threshold if threshold is not None else _settings.hallucination_risk_threshold
+    if score >= base + 0.15:
         return RiskLevel.CRITICAL
-    if score >= 0.6:
+    if score >= base:
         return RiskLevel.HIGH
-    if score >= 0.35:
+    if score >= base - 0.25:
         return RiskLevel.MEDIUM
     return RiskLevel.LOW
 
 
-# ── Faithfulness scorer ───────────────────────────────────────────────────────
+# Faithfulness scorer
 
 def compute_faithfulness(verdicts: list[ClaimVerdict]) -> float:
     """
@@ -56,7 +52,7 @@ def compute_faithfulness(verdicts: list[ClaimVerdict]) -> float:
     return supported_weight / total_weight
 
 
-# ── Entropy scorer ────────────────────────────────────────────────────────────
+# Entropy scorer
 
 def token_entropy(logprobs: Sequence[float]) -> float:
     """
@@ -101,7 +97,7 @@ def compute_entropy_spans(
     return spans
 
 
-# ── Main engine ───────────────────────────────────────────────────────────────
+# Main engine
 
 class HallucinationDetector:
     """
@@ -110,7 +106,7 @@ class HallucinationDetector:
 
     Weights (configurable):
         faithfulness:      40%
-        self-reflection:   40%   (inverted — low confidence = high risk)
+        self-reflection:   40%   (inverted - low confidence = high risk)
         entropy:           20%
     """
 
@@ -127,6 +123,7 @@ class HallucinationDetector:
         self_reflection_confidence: float,
         self_critique: str = "",
         entropy_spans: list[EntropySpan] | None = None,
+        risk_threshold: float | None = None,
     ) -> HallucinationReport:
         spans = entropy_spans or []
 
@@ -147,11 +144,19 @@ class HallucinationDetector:
             + self.W_REFLECT * reflect_risk
             + self.W_ENTROPY * norm_entropy
         )
+
+        # Floor penalty: any unsupported claim guarantees a minimum risk
+        if claim_verdicts:
+            unsupported = sum(1 for v in claim_verdicts if not v.supported)
+            if unsupported > 0:
+                floor = unsupported / len(claim_verdicts)
+                risk_score = max(risk_score, floor)
+
         risk_score = round(min(1.0, max(0.0, risk_score)), 4)
 
         report = HallucinationReport(
             response_id=response_id,
-            overall_risk=score_to_risk(risk_score),
+            overall_risk=score_to_risk(risk_score, threshold=risk_threshold),
             risk_score=risk_score,
             faithfulness_score=round(faithfulness, 4),
             self_reflection_confidence=round(self_reflection_confidence, 4),

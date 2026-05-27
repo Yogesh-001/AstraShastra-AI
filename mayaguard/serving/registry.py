@@ -1,12 +1,6 @@
 """
-serving/registry.py — Adapter registry.
-
-Maps adapter name strings to initialised MayaGuardPipeline instances.
-Pipelines are created lazily and cached.
-
-To register a new domain adapter:
-    from adapters.medical import MedicalAdapter
-    registry.register("medical", MedicalAdapter())
+Domain adapter registry.
+Caches and lazily initializes pipeline instances mapped to specific adapter profiles.
 """
 
 from __future__ import annotations
@@ -14,12 +8,18 @@ from __future__ import annotations
 from typing import Optional
 
 from adapters.default import DefaultAdapter
+from adapters.medical import MedicalAdapter
+from adapters.legal import LegalAdapter
+from adapters.devops import DevopsAdapter
 from core.retrieval.retriever import Retriever
 from serving.pipeline import MayaGuardPipeline
 
 _pipelines: dict[str, MayaGuardPipeline] = {}
 _adapters = {
     "default": DefaultAdapter(),
+    "medical": MedicalAdapter(),
+    "legal": LegalAdapter(),
+    "devops": DevopsAdapter(),
 }
 
 

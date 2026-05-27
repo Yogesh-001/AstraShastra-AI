@@ -1,8 +1,6 @@
 """
-adapters/default.py — Generic domain adapter (no domain specialisation).
-
-Used when no adapter name is specified.  All domain-specific adapters
-replace or extend these values.
+Generic fallback domain adapter.
+Used when no specific adapter is selected.
 """
 
 from adapters.base import DomainAdapter, EvaluationSuite, PromptTemplate, SafetyPolicy

@@ -1,8 +1,3 @@
-"""
-MayaGuard shared domain models.
-All inter-module data structures live here to avoid circular imports.
-"""
-
 from __future__ import annotations
 
 from enum import Enum
@@ -12,7 +7,7 @@ from uuid import UUID, uuid4
 from pydantic import BaseModel, Field
 
 
-# ── Enumerations ──────────────────────────────────────────────────────────────
+# Core Enums
 
 class RiskLevel(str, Enum):
     LOW = "low"
@@ -28,10 +23,9 @@ class ControllerAction(str, Enum):
     REFUSE = "refuse"
 
 
-# ── Retrieval ─────────────────────────────────────────────────────────────────
+# Retrieval models
 
 class Document(BaseModel):
-    """A single retrieved document / chunk."""
     id: str = Field(default_factory=lambda: str(uuid4()))
     content: str
     source: str
@@ -45,10 +39,9 @@ class RetrievalResult(BaseModel):
     total_found: int
 
 
-# ── Claims ────────────────────────────────────────────────────────────────────
+# Claim structures
 
 class Claim(BaseModel):
-    """An atomic factual assertion extracted from a response."""
     id: str = Field(default_factory=lambda: str(uuid4()))
     text: str
     span_start: int | None = None
@@ -56,7 +49,6 @@ class Claim(BaseModel):
 
 
 class ClaimVerdict(BaseModel):
-    """Verification result for a single claim."""
     claim: Claim
     supported: bool
     confidence: float = Field(ge=0.0, le=1.0)
@@ -64,10 +56,9 @@ class ClaimVerdict(BaseModel):
     explanation: str = ""
 
 
-# ── Hallucination ─────────────────────────────────────────────────────────────
+# Hallucination assessment report
 
 class EntropySpan(BaseModel):
-    """A text span with token-level uncertainty metrics."""
     text: str
     entropy: float
     perplexity: float | None = None
@@ -75,7 +66,6 @@ class EntropySpan(BaseModel):
 
 
 class HallucinationReport(BaseModel):
-    """Aggregated hallucination analysis for one response."""
     response_id: str = Field(default_factory=lambda: str(uuid4()))
     overall_risk: RiskLevel
     risk_score: float = Field(ge=0.0, le=1.0)
@@ -94,10 +84,9 @@ class HallucinationReport(BaseModel):
     retrieved_documents: list[Document] = Field(default_factory=list)
 
 
-# ── Evaluation ────────────────────────────────────────────────────────────────
+# Evaluation models
 
 class EvaluationSample(BaseModel):
-    """One labelled sample for evaluation."""
     id: str = Field(default_factory=lambda: str(uuid4()))
     query: str
     reference_answer: str
@@ -115,7 +104,7 @@ class EvaluationMetrics(BaseModel):
     total_samples: int
 
 
-# ── API request / response ────────────────────────────────────────────────────
+# Endpoint request / response structures
 
 class QueryRequest(BaseModel):
     query: str = Field(..., min_length=1, max_length=2000)
