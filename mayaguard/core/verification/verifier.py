@@ -6,11 +6,9 @@ Extracts factual claims from LLM answers and verifies them against retrieved sou
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
-
-import httpx
 
 from core.config import get_settings
+from core.inference import get_inference_client
 from core.logging import get_logger
 from core.models import Claim, ClaimVerdict, Document
 
@@ -59,10 +57,6 @@ class ClaimExtractor:
     Fallback: simple sentence-splitting when the LLM is unavailable.
     """
 
-    def __init__(self, ollama_url: str | None = None, model: str | None = None):
-        self._url = (ollama_url or _settings.ollama_base_url) + "/api/generate"
-        self._model = model or _settings.ollama_model
-
     async def extract(self, text: str) -> list[Claim]:
         try:
             claims = await self._llm_extract(text)
@@ -74,13 +68,8 @@ class ClaimExtractor:
 
     async def _llm_extract(self, text: str) -> list[Claim]:
         prompt = _EXTRACT_PROMPT.format(text=text)
-        async with httpx.AsyncClient(timeout=30) as client:
-            resp = await client.post(
-                self._url,
-                json={"model": self._model, "prompt": prompt, "stream": False},
-            )
-            resp.raise_for_status()
-        raw = resp.json().get("response", "")
+        client = await get_inference_client()
+        raw = await client.generate(prompt)
         return self._parse_numbered_list(raw)
 
     @staticmethod
@@ -106,10 +95,6 @@ class GroundingChecker:
     Verifies each claim against a set of retrieved documents using an LLM.
     """
 
-    def __init__(self, ollama_url: str | None = None, model: str | None = None):
-        self._url = (ollama_url or _settings.ollama_base_url) + "/api/generate"
-        self._model = model or _settings.ollama_model
-
     async def verify(
         self, claims: list[Claim], documents: list[Document]
     ) -> list[ClaimVerdict]:
@@ -128,13 +113,8 @@ class GroundingChecker:
     ) -> ClaimVerdict:
         prompt = _VERIFY_PROMPT.format(claim=claim.text, context=context[:4000])
         try:
-            async with httpx.AsyncClient(timeout=30) as client:
-                resp = await client.post(
-                    self._url,
-                    json={"model": self._model, "prompt": prompt, "stream": False},
-                )
-                resp.raise_for_status()
-            raw: str = resp.json().get("response", "").strip()
+            client = await get_inference_client()
+            raw: str = await client.generate(prompt)
             lines = raw.splitlines()
             verdict_word = lines[0].strip().upper() if lines else "UNSUPPORTED"
             explanation = lines[1].strip() if len(lines) > 1 else ""

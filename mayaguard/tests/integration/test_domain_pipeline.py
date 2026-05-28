@@ -1,6 +1,8 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
+from core.inference import reset_client
+
 from core.models import Document, RetrievalResult, QueryRequest, ControllerAction, RiskLevel
 from core.retrieval.retriever import Retriever
 from serving.pipeline import MayaGuardPipeline
@@ -15,6 +17,7 @@ def mock_retriever_dependencies():
     """
     from serving.registry import _pipelines
     _pipelines.clear()  # Ensure clean pipeline initialization under mocks
+    reset_client()      # Reset the inference client singleton between tests
 
     mock_transformer = MagicMock()
     mock_transformer.get_sentence_embedding_dimension.return_value = 384

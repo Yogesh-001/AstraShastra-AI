@@ -36,6 +36,13 @@ benchmarks/results/*.json
 docker/volumes/
 mayaguard_qdrant_local/
 
+# Fine-tuning
+finetuning/outputs/
+finetuning/data/*.jsonl
+*.safetensors
+*.bin
+wandb/
+
 # OS
 .DS_Store
 Thumbs.db

@@ -8,12 +8,10 @@ from __future__ import annotations
 import time
 from uuid import uuid4
 
-import httpx
-
 from adapters.base import DomainAdapter
 from core.config import get_settings
-from core.evaluation.evaluator import Evaluator
 from core.hallucination.detector import HallucinationDetector
+from core.inference import get_inference_client
 from core.logging import get_logger
 from core.models import (
     ControllerAction,
@@ -143,17 +141,8 @@ class MayaGuardPipeline:
             system=system, context=context[:3000], query=query
         )
         try:
-            async with httpx.AsyncClient(timeout=60) as client:
-                resp = await client.post(
-                    _settings.ollama_base_url + "/api/generate",
-                    json={
-                        "model": _settings.ollama_model,
-                        "prompt": prompt,
-                        "stream": False,
-                    },
-                )
-                resp.raise_for_status()
-            return resp.json().get("response", "").strip()
+            client = await get_inference_client()
+            return await client.generate(prompt)
         except Exception as exc:
             logger.warning("pipeline.generate_offline_fallback", error=str(exc))
             # Synthesize a realistic answer from the retrieved context

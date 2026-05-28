@@ -10,14 +10,17 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # LLM configuration
+    # LLM configuration (Ollama - default backend)
     ollama_base_url: str = "http://127.0.0.1:11434"
     ollama_model: str = "mistral:7b-instruct-q4_K_M"
     ollama_embed_model: str = "nomic-embed-text"
 
+    # vLLM configuration (production GPU serving)
+    vllm_enabled: bool = False
     vllm_base_url: str = "http://127.0.0.1:8000"
     vllm_model: str = "mistralai/Mistral-7B-Instruct-v0.2"
-    vllm_enabled: bool = False
+    vllm_max_tokens: int = 512
+    vllm_temperature: float = 0.3
 
     # Vector Database
     qdrant_url: str = "http://127.0.0.1:6333"
@@ -39,6 +42,12 @@ class Settings(BaseSettings):
     # Observability
     prometheus_enabled: bool = True
     prometheus_port: int = 9090
+
+    # Fine-tuned models
+    finetuned_verifier_path: str = ""
+    finetuned_verifier_enabled: bool = False
+    qlora_adapter_path: str = ""
+    qlora_adapter_enabled: bool = False
 
 
 @lru_cache(maxsize=1)

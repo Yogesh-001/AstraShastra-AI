@@ -28,6 +28,35 @@ services:
               capabilities: [gpu]
     restart: unless-stopped
 
+  # -- vLLM (optional - high-throughput GPU serving) ---------------------
+  # Uncomment below to deploy vLLM as the primary LLM inference backend.
+  # Requires: Linux host + NVIDIA GPU with sufficient VRAM (16GB+ recommended).
+  # After starting, set VLLM_ENABLED=true in your .env file.
+  #
+  # vllm:
+  #   image: vllm/vllm-openai:latest
+  #   container_name: mayaguard-vllm
+  #   ports:
+  #     - "8000:8000"
+  #   environment:
+  #     - MODEL_NAME=mistralai/Mistral-7B-Instruct-v0.2
+  #     - MAX_MODEL_LEN=4096
+  #   command: >
+  #     --model mistralai/Mistral-7B-Instruct-v0.2
+  #     --max-model-len 4096
+  #     --dtype float16
+  #     --gpu-memory-utilization 0.85
+  #   volumes:
+  #     - vllm_cache:/root/.cache/huggingface
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1
+  #             capabilities: [gpu]
+  #   restart: unless-stopped
+
   api:
     build:
       context: .
@@ -40,6 +69,9 @@ services:
     environment:
       - OLLAMA_BASE_URL=http://ollama:11434
       - QDRANT_URL=http://qdrant:6333
+      # Uncomment below when using vLLM
+      # - VLLM_ENABLED=true
+      # - VLLM_BASE_URL=http://vllm:8000
     depends_on:
       - qdrant
       - ollama
@@ -61,3 +93,4 @@ services:
 volumes:
   qdrant_data:
   ollama_models:
+  # vllm_cache:

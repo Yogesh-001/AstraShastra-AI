@@ -2,9 +2,8 @@
 
 from __future__ import annotations
 
-import httpx
-
 from core.config import get_settings
+from core.inference import get_inference_client
 from core.logging import get_logger
 from core.models import (
     ControllerAction,
@@ -42,10 +41,6 @@ class ResponseController:
     """
     Applies an adaptive policy to a raw LLM answer given its HallucinationReport.
     """
-
-    def __init__(self, ollama_url: str | None = None, model: str | None = None):
-        self._url = (ollama_url or _settings.ollama_base_url) + "/api/generate"
-        self._model = model or _settings.ollama_model
 
     async def control(
         self,
@@ -89,13 +84,8 @@ class ResponseController:
         )
         prompt = _REWRITE_PROMPT.format(answer=answer, sources=sources)
         try:
-            async with httpx.AsyncClient(timeout=60) as client:
-                resp = await client.post(
-                    self._url,
-                    json={"model": self._model, "prompt": prompt, "stream": False},
-                )
-                resp.raise_for_status()
-            return resp.json().get("response", answer).strip()
+            client = await get_inference_client()
+            return await client.generate(prompt)
         except Exception as exc:
             logger.warning("controller.rewrite_failed", error=str(exc))
             return answer

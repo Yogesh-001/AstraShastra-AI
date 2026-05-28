@@ -7,9 +7,8 @@ from __future__ import annotations
 
 import re
 
-import httpx
-
 from core.config import get_settings
+from core.inference import get_inference_client
 from core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -44,10 +43,6 @@ class SelfReflectionAgent:
     Low confidence scores are a strong signal for the hallucination engine.
     """
 
-    def __init__(self, ollama_url: str | None = None, model: str | None = None):
-        self._url = (ollama_url or _settings.ollama_base_url) + "/api/generate"
-        self._model = model or _settings.ollama_model
-
     async def reflect(self, query: str, answer: str) -> tuple[float, str]:
         """
         Ask the model to critique *answer* given *query*.
@@ -58,13 +53,8 @@ class SelfReflectionAgent:
         """
         prompt = _REFLECT_PROMPT.format(query=query, answer=answer)
         try:
-            async with httpx.AsyncClient(timeout=45) as client:
-                resp = await client.post(
-                    self._url,
-                    json={"model": self._model, "prompt": prompt, "stream": False},
-                )
-                resp.raise_for_status()
-            raw: str = resp.json().get("response", "").strip()
+            client = await get_inference_client()
+            raw: str = await client.generate(prompt)
             confidence, critique = self._parse(raw)
         except Exception as exc:
             logger.warning("self_reflection.offline_fallback", error=str(exc))
