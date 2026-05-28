@@ -204,6 +204,12 @@ MayaGuard separates domain parameters into independent adapters. The framework i
 - **Threshold:** Standard `risk_threshold_override = 0.55` for server configuration checks.
 - **Safety Policy:** Excludes standard disclaimers to keep systems output clean and highly readable.
 
+## 🔌 RAG Integration & Custom Adapters
+
+MayaGuard can be easily integrated into **any** existing Python, JavaScript/TypeScript, or Go RAG pipeline. If your application covers topics other than the pre-built domains (Medical, Legal, DevOps) - such as Aerospace or Orbital Systems (AOS) - you can use the generic `"default"` profile out of the box, or easily implement and register your own custom domain adapter!
+
+For a full step-by-step developer guide on RAG integration strategies and adapter design patterns, see the **[MayaGuard RAG Integration & Adapter Guide](INTEGRATION.md)**.
+
 ---
 
 ## 🧪 Testing
